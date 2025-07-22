@@ -52,6 +52,7 @@
                                     Numéro de facture
                                 </label>
                                 {{ form.numero }}
+                                <small class="text-muted">Généré automatiquement</small>
                                 {% if form.numero.errors %}
                                     <div class="text-danger small mt-1">
                                         {{ form.numero.errors.0 }}
