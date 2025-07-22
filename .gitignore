@@ -1,0 +1,39 @@
+# Python compiled files
+*.pyc
+__pycache__/
+
+# SQLite database
+db.sqlite3
+
+# Logs
+*.log
+
+# Media files
+media/
+
+# Virtual environments
+venv-gestion-factures/
+env/
+.env
+
+# IDE config files
+.idea/
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Test and coverage
+.tox/
+.coverage
+
+# Distribution files
+*.egg-info/
+build/
+dist/
+
+# Local settings
+local_settings.py
+
+NOTES.md

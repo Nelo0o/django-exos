@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Liste des Factures - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1">
+                    Liste des Factures
+                </h1>
+                <p class="text-muted mb-0">Gérez toutes vos factures en un seul endroit</p>
+            </div>
+            <a href="{% url 'facture-create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>
+                Nouvelle Facture
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-3">
+        <form method="get" class="form-inline">
+            <label for="client" class="me-2">Filtrer par client :</label>
+            <select name="client" id="client" class="form-select d-inline-block w-auto me-2" onchange="this.form.submit()">
+                <option value="">Tous les clients</option>
+                {% for client in clients %}
+                    <option value="{{ client.id }}" {% if client.id|stringformat:'s' == selected_client %}selected{% endif %}>{{ client.nom }}</option>
+                {% endfor %}
+            </select>
+            <label for="categorie" class="me-2">Filtrer par catégorie :</label>
+            <select name="categorie" id="categorie" class="form-select d-inline-block w-auto me-2" onchange="this.form.submit()">
+                <option value="">Toutes les catégories</option>
+                {% for categorie in categories %}
+                    <option value="{{ categorie.id }}" {% if categorie.id|stringformat:'s' == selected_categorie %}selected{% endif %}>{{ categorie.nom }}</option>
+                {% endfor %}
+            </select>
+            <noscript><button type="submit" class="btn btn-primary btn-sm">Filtrer</button></noscript>
+        </form>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="mb-0">
+                            <i class="fas fa-table me-2"></i>
+                            Factures ({{ object_list|length }})
+                        </h5>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if object_list %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>N° Facture</th>
+                                    <th>Client</th>
+                                    <th>Date</th>
+                                    <th>Montant HT</th>
+                                    <th>TVA</th>
+                                    <th>Montant TTC</th>
+                                    <th>Catégorie</th>
+                                    <th>Statut</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for facture in object_list %}
+                                    <tr>
+                                        <td>
+                                            <strong class="text-primary">#{{ facture.numero }}</strong>
+                                        </td>
+                                        <td>
+                                            {% if facture.client %}
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center me-2">
+                                                        <i class="fas fa-user text-muted"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-medium">{{ facture.client.nom }}</div>
+                                                        <small class="text-muted">{{ facture.client.email|default:"" }}</small>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">{{ facture.date|date:"d M Y" }}</span>
+                                        </td>
+                                        <td>
+                                            <strong>{{ facture.montant|floatformat:2 }} €</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark">{{ facture.tax|floatformat:1 }}%</span>
+                                        </td>
+                                        <td>
+                                            <strong class="text-success">{{ facture.montant_ttc|floatformat:2 }} €</strong>
+                                        </td>
+                                        <td>
+                                            {% if facture.categorie %}
+                                                <span class="badge bg-secondary">{{ facture.categorie.nom }}</span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if facture.payee %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check me-1"></i>
+                                                    Payée
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    En attente
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'facture-detail' facture.pk %}" 
+                                                   class="btn btn-outline-primary" 
+                                                   title="Voir les détails">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'facture-update' facture.pk %}" 
+                                                   class="btn btn-outline-secondary" 
+                                                   title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'facture-delete' facture.pk %}" 
+                                                   class="btn btn-outline-danger" 
+                                                   title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-file-invoice fa-3x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted mb-3">Aucune facture trouvée</h5>
+                        <p class="text-muted mb-4">Commencez par créer votre première facture</p>
+                        <a href="{% url 'facture-create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>
+                            Créer une facture
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+}
+</style>
+{% endblock %}

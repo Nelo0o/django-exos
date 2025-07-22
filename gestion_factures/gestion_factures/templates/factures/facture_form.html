@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if object %}
+        Modifier Facture #{{ object.numero }} - {{ block.super }}
+    {% else %}
+        Nouvelle Facture - {{ block.super }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        {% if object %}
+                            <i class="fas fa-edit fa-2x text-warning"></i>
+                        {% else %}
+                            <i class="fas fa-plus-circle fa-2x text-success"></i>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h4 class="mb-1">
+                            {% if object %}
+                                Modifier la facture #{{ object.numero }}
+                            {% else %}
+                                Nouvelle facture
+                            {% endif %}
+                        </h4>
+                        <p class="text-muted mb-0">
+                            {% if object %}
+                                Modifiez les informations de cette facture
+                            {% else %}
+                                Créez une nouvelle facture pour votre client
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <form method="post" id="factureForm">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.numero.id_for_label }}" class="form-label">
+                                    <i class="fas fa-hashtag me-1"></i>
+                                    Numéro de facture
+                                </label>
+                                {{ form.numero }}
+                                {% if form.numero.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.numero.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.client.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    Client
+                                </label>
+                                {{ form.client }}
+                                {% if form.client.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.client.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.montant.id_for_label }}" class="form-label">
+                                    <i class="fas fa-euro-sign me-1"></i>
+                                    {{ form.montant.label }}
+                                </label>
+                                <div class="input-group">
+                                    {{ form.montant }}
+                                    <span class="input-group-text">€</span>
+                                </div>
+                                {% if form.montant.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.montant.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.tax.id_for_label }}" class="form-label">
+                                    <i class="fas fa-percentage me-1"></i>
+                                    {{ form.tax.label }}
+                                </label>
+                                <div class="input-group">
+                                    {{ form.tax }}
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                {% if form.tax.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.tax.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-calculator me-1"></i>
+                                    Montant TTC
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="montantTTC" readonly placeholder="0.00">
+                                    <span class="input-group-text">€</span>
+                                </div>
+                                <small class="text-muted">Calculé automatiquement</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.categorie.id_for_label }}" class="form-label">
+                                    <i class="fas fa-tags me-1"></i>
+                                    Catégorie
+                                </label>
+                                {{ form.categorie }}
+                                <small class="text-muted">Laissez vide pour assigner automatiquement à "Autres"</small>
+                                {% if form.categorie.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.categorie.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    Statut
+                                </label>
+                                <div class="form-check form-switch">
+                                    {{ form.payee }}
+                                    <label class="form-check-label" for="{{ form.payee.id_for_label }}">
+                                        Facture payée
+                                    </label>
+                                </div>
+                                {% if form.payee.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.payee.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.commentaires.id_for_label }}" class="form-label">
+                            <i class="fas fa-comment me-1"></i>
+                            Commentaires
+                        </label>
+                        {{ form.commentaires }}
+                        {% if form.commentaires.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.commentaires.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'facture-list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>
+                            {% if object %}Mettre à jour{% else %}Créer la facture{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const montantInput = document.getElementById('{{ form.montant.id_for_label }}');
+    const taxInput = document.getElementById('{{ form.tax.id_for_label }}');
+    const montantTTCInput = document.getElementById('montantTTC');
+    
+    function calculateTTC() {
+        const montant = parseFloat(montantInput.value) || 0;
+        const tax = parseFloat(taxInput.value) || 0;
+        const ttc = montant * (1 + tax / 100);
+        montantTTCInput.value = ttc.toFixed(2);
+    }
+    
+    // Calculer au chargement de la page
+    calculateTTC();
+    
+    // Recalculer à chaque modification
+    montantInput.addEventListener('input', calculateTTC);
+    taxInput.addEventListener('input', calculateTTC);
+    
+    // Ajouter les classes Bootstrap aux champs de formulaire
+    const formControls = document.querySelectorAll('input, select, textarea');
+    formControls.forEach(function(control) {
+        if (control.type !== 'checkbox') {
+            control.classList.add('form-control');
+        }
+    });
+    
+    // Classe spéciale pour les checkboxes
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(function(checkbox) {
+        checkbox.classList.add('form-check-input');
+    });
+});
+</script>
+{% endblock %}

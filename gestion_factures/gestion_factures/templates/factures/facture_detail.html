@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Facture #{{ object.numero }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1">
+                    <i class="fas fa-file-invoice text-primary me-2"></i>
+                    Facture #{{ object.numero }}
+                </h1>
+                <p class="text-muted mb-0">Créée le {{ object.date|date:"d F Y" }}</p>
+            </div>
+            <div class="btn-group" role="group">
+                <a href="{% url 'facture-update' object.pk %}" class="btn btn-outline-primary">
+                    <i class="fas fa-edit me-2"></i>
+                    Modifier
+                </a>
+                <a href="{% url 'facture-delete' object.pk %}" class="btn btn-outline-danger">
+                    <i class="fas fa-trash me-2"></i>
+                    Supprimer
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informations de la facture
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">NUMÉRO DE FACTURE</label>
+                            <div class="fw-bold fs-5 text-primary">#{{ object.numero }}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">DATE DE CRÉATION</label>
+                            <div class="fw-medium">{{ object.date|date:"d F Y" }}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">CATÉGORIE</label>
+                            <div>
+                                {% if object.categorie %}
+                                    <span class="badge bg-secondary fs-6">{{ object.categorie.nom }}</span>
+                                {% else %}
+                                    <span class="text-muted">Aucune catégorie</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">CLIENT</label>
+                            <div>
+                                {% if object.client %}
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center me-2">
+                                            <i class="fas fa-user text-muted"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium">{{ object.client.nom }}</div>
+                                            {% if object.client.email %}
+                                                <small class="text-muted">{{ object.client.email }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted">Aucun client assigné</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">STATUT</label>
+                            <div>
+                                {% if object.payee %}
+                                    <span class="badge bg-success fs-6">
+                                        <i class="fas fa-check me-1"></i>
+                                        Payée
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-warning fs-6">
+                                        <i class="fas fa-clock me-1"></i>
+                                        En attente
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if object.commentaires %}
+                    <div class="border-top pt-3">
+                        <label class="form-label text-muted small">COMMENTAIRES</label>
+                        <div class="bg-light p-3 rounded">
+                            {{ object.commentaires|linebreaks }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calculator me-2"></i>
+                    Résumé financier
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Montant HT</span>
+                    <span class="fw-bold">{{ object.montant|floatformat:2 }} €</span>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Taux de TVA</span>
+                    <span class="badge bg-light text-dark">{{ object.tax|floatformat:1 }}%</span>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Montant TVA</span>
+                    <span class="fw-medium text-secondary">
+                        {% widthratio object.montant 100 object.tax as tva_amount %}
+                        {{ tva_amount|floatformat:2 }} €
+                    </span>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold fs-5">Total TTC</span>
+                    <span class="fw-bold fs-4 text-success">{{ object.montant_ttc|floatformat:2 }} €</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-cog me-2"></i>
+                    Actions rapides
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'facture-update' object.pk %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-edit me-2"></i>
+                        Modifier la facture
+                    </a>
+                    <button class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-download me-2"></i>
+                        Télécharger PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="{% url 'facture-list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>
+            Retour à la liste
+        </a>
+    </div>
+</div>
+
+<style>
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePaymentStatus() {
+    // Cette fonction pourrait être implémentée pour changer le statut via AJAX
+    alert('Fonctionnalité à implémenter : changement de statut via AJAX');
+}
+</script>
+{% endblock %}
