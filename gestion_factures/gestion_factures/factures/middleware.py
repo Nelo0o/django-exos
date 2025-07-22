@@ -20,9 +20,7 @@ def modifier_historique(sender, instance, created, **kwargs):
 
 @receiver(pre_delete, sender=Facture)
 def supprimer_historique(sender, instance, **kwargs):
-    # Créer l'historique de suppression avant que la facture soit supprimée
-    # On ne peut pas référencer la facture car elle va être supprimée
     HistoriqueFacture.objects.create(
-        facture=None,  # La facture sera supprimée, on ne peut pas la référencer
+        facture=instance,
         action=f'Suppression de la facture {instance.numero}'
     )
