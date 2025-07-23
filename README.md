@@ -25,3 +25,12 @@ python manage.py migrate
 ```bash
 python manage.py runserver
 ```
+L'application est disponible à l'adresse http://localhost:8000/factures/
+
+### Pour l'administrateur
+
+```bash
+python manage.py createsuperuser
+```
+
+Et se rendre sur http://localhost:8000/admin/ pour se connecter avec les identifiants créés.
