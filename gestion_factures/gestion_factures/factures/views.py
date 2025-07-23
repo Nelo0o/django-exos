@@ -5,6 +5,7 @@ from clients.models import Client
 from .forms import FactureForm
 
 class FactureFormMixin:
+    """Mixin pour partager la configuration commune des formulaires de facture"""
     model = Facture
     form_class = FactureForm
     template_name = 'factures/facture_form.html'
@@ -15,10 +16,12 @@ class FactureListView(ListView):
     template_name = 'factures/facture_list.html'
 
     def get_queryset(self):
+        """Applique les filtres dynamiques selon les paramètres GET"""
         queryset = super().get_queryset()
         
+        # Construction dynamique des filtres
         filters = {}
-        if client_id := self.request.GET.get('client'):
+        if client_id := self.request.GET.get('client'):  # Walrus operator pour assignation + test, très pratique
             filters['client_id'] = client_id
         if categorie_id := self.request.GET.get('categorie'):
             filters['categorie_id'] = categorie_id
@@ -26,12 +29,13 @@ class FactureListView(ListView):
         return queryset.filter(**filters) if filters else queryset
 
     def get_context_data(self, **kwargs):
+        """Ajoute les données nécessaires pour les filtres et statistiques"""
         context = super().get_context_data(**kwargs)
+        # Données pour les filtres
         context['clients'] = Client.objects.all()
         context['categories'] = Categorie.objects.all()
         context['selected_client'] = self.request.GET.get('client', '')
         context['selected_categorie'] = self.request.GET.get('categorie', '')
-        context['stats'] = Facture.objects.stats()
         
         return context
 

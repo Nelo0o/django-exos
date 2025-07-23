@@ -17,7 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+# Configuration des URLs principales du projet
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('factures/', include('factures.urls')),
+    path('admin/', admin.site.urls),  # Interface d'admin
+    path('factures/', include('factures.urls')),  # URLs de l'app factures
 ]
